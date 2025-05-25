@@ -1,0 +1,80 @@
+playbook_name: "Setup fresh VM"
+
+hosts:
+  - host1:
+      host: 192.168.10.1
+      port: 22
+      user: user
+      password: "plain"
+      private_key: "~/.ssh/id_rsa"
+  - host2:
+      host: 192.168.10.2
+      port: 22
+      user: user
+      password: "plain"
+      private_key: "~/.ssh/id_rsa"
+  - host3:
+      host: 192.168.10.3
+      port: 22
+      user: user
+      password: "plain"
+      private_key: "~/.ssh/id_rsa"
+  - host4:
+      host: 192.168.10.4
+      port: 22
+      user: user
+      password: "plain"
+      private_key: "~/.ssh/id_rsa"
+  - host5:
+      host: 192.168.10.5
+      port: 22
+      user: user
+      password: "plain"
+      private_key: "~/.ssh/id_rsa"
+    
+jobs:
+  setup: 
+    hosts:
+      - host1
+      - host2
+      - host3
+      - host4
+      - host5
+    tasks:
+      - name: "Create a .ssh directory"
+        script: "mkdir -p ~/.ssh"
+      - name: "Add public key"
+        script: "echo \"YOUR_PUBLIC_SSH_KEY_HERE\" >> ~/.ssh/authorized_keys"
+      - name: "Reconfigure sshd for public key auth"
+        script: |
+          sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/g' /etc/ssh/sshd_config
+          sed -i 's/#PubkeyAuthentication yes/PubkeyAuthentication yes/g' /etc/ssh/sshd_config
+          systemctl restart sshd
+      - name: "Update apt package lists"
+        script: "apt update -y"
+      - name: "Upgrade packages"
+        script: "apt upgrade -y"
+      - name: "Set locale"
+        script: |
+          echo "LC_ALL=en_US.UTF-8" >> /etc/environment
+          echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
+          echo "LANG=en_US.UTF-8" > /etc/locale.conf
+          locale-gen en_US.UTF-8
+      - name: "Install utils"
+        script: "apt install ca-certificates curl"
+      - name: "Add Docker's APT repository"
+        script: |
+          # Add Docker's official GPG key:
+          install -m 0755 -d /etc/apt/keyrings
+          curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
+          chmod a+r /etc/apt/keyrings/docker.asc
+
+          # Add the repository to Apt sources:
+          echo \
+            "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian \
+            $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+            tee /etc/apt/sources.list.d/docker.list > /dev/null
+      - name: "Update apt package lists"
+        script: "apt update -y"
+      - name: "Install the latest Docker"
+        script: "apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y"
