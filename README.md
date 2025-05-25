@@ -55,7 +55,7 @@ Command-Line Flags
 -debug: Enables debug mode, which prints detailed output, including command outputs. (Default: false)
 ```
 
-## Example
+### Example
 
 ```bash
 # Run tasks using the default playbook.yaml with 15 concurrent routines
