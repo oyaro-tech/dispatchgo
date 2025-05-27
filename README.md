@@ -57,6 +57,12 @@ Command-Line Flags
 
 ### Example
 
+> [!CAUTION]
+> Please remember that all public keys of servers need to be in your `~/.ssh/known_hosts` file before you run the program.
+
+> [!TIP]
+> If you need to scan the server's public key, please run the following command: `ssh-keyscan <host> >> ~/.ssh/known_hosts`
+
 ```bash
 # Run tasks using the default playbook.yaml with 15 concurrent routines
 ./dispatchgo -routines 15
